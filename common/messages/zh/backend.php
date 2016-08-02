@@ -165,4 +165,5 @@ return [
     'i18n Message' => '国际化信息',
     'i18n Source Message' => '国际化源信息',
     'Auth' => '权限管理',
+    'Please select user\'s Status' => '请选择用户的状态',
 ];

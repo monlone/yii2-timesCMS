@@ -80,4 +80,5 @@ return [
     'Search for assigned' => '查找已分配的',
     'Assign' => '分配',
     'Remove' => '移除',
+    'Please select user\'s Status' => '请选择用户的状态',
 ];

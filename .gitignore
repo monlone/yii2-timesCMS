@@ -1,6 +1,7 @@
 # Env
 /.env
 /vhost.conf
+/.phpintel
 
 # composer
 /vendor
