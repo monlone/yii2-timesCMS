@@ -1,0 +1,20 @@
+{
+  "name": "yeesoft/yii2-comments",
+  "description": "Comments Module For Yii2 Framework",
+  "license": "Apache-2.0",
+  "authors": [
+    {
+      "name": "Taras Makitra",
+      "email": "makitrataras@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "yeesoft\\comments\\": ""
+    }
+  },
+  "require": {
+    "yiisoft/yii2": "*",
+    "yiidoc/yii2-timeago": "dev-master"
+  }
+}

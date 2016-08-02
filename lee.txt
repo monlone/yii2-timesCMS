@@ -1,0 +1,120 @@
+http://localhost/yii2-timesCMS-old/backend/web/admin#/assignment
+
+#单域名的nginx配置
+server {
+    listen       80;
+    server_name  yii2-timesCMS.dev;
+
+    #charset koi8-r;
+    #access_log  /var/log/nginx/log/host.access.log  main;
+
+    root   /usr/share/nginx/html/yii2-timesCMS;
+    index  index.php index.html index.htm;
+
+    location / {
+        try_files $uri /frontend/web/index.php?$args;
+        if (!-e $request_filename){  
+            #rewrite ^/(.*) /frontend/web/index.php last;
+            rewrite ^/(.*) /frontend/web/index.php last;  
+        }
+    }
+
+    location /admin {
+        try_files  $uri /backend/web/index.php?$args;
+        if (!-e $request_filename){  
+            rewrite ^/(.*) /backend/web/index.php last;  
+        }
+    }
+
+    # storage access
+    location /storage {
+        try_files  $uri /storage/web/index.php?$args;
+        if (!-e $request_filename){  
+            rewrite ^/(.*) /storage/web/index.php last;  
+        }
+    }
+
+    #error_page  404              /404.html;
+
+    # redirect server error pages to the static page /50x.html
+    #
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html/yii2-timesCMS/frontend/web/index.php;
+    }
+
+    location ~ \.php$ {
+		root /usr/share/nginx/html/yii2-timesCMS;
+		fastcgi_pass 127.0.0.1:9000;
+		fastcgi_index index.php;
+		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+		include fastcgi_params;
+    }
+
+    # deny access to .htaccess files, if Apache's document root
+    # concurs with nginx's one
+    #
+    #location ~ /\.ht {
+    #    deny  all;
+    #}
+}
+
+#单域名的apache配置
+<VirtualHost *:80>
+    ServerName yii2-timesCMS.dev
+
+    RewriteEngine on
+    # the main rewrite rule for the frontend application
+    RewriteCond %{HTTP_HOST} ^yii2-timesCMS.dev$ [NC] 
+    RewriteCond %{REQUEST_URI} !^/(backend/web|admin|storage/web)
+    RewriteRule !^/frontend/web /frontend/web%{REQUEST_URI} [L]
+    # redirect to the page without a trailing slash (uncomment if necessary)
+    #RewriteCond %{REQUEST_URI} ^/admin/$
+    #RewriteRule ^(/admin)/ $1 [L,R=301]
+    # disable the trailing slash redirect
+    RewriteCond %{REQUEST_URI} ^/admin$
+    RewriteRule ^/admin /backend/web/index.php [L]
+    # the main rewrite rule for the backend application
+    RewriteCond %{REQUEST_URI} ^/admin
+    RewriteRule ^/admin(.*) /backend/web$1 [L]
+
+    DocumentRoot "D:/wamp64/www/yii2-timesCMS"
+    <Directory />
+        Options FollowSymLinks
+        AllowOverride None
+        AddDefaultCharset utf-8
+    </Directory>
+    <Directory "D:/wamp64/www/yii2-timesCMS/frontend/web">
+        RewriteEngine on
+        # if a directory or a file exists, use the request directly
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteCond %{REQUEST_FILENAME} !-d
+        # otherwise forward the request to index.php
+        RewriteRule . index.php
+
+        Require all granted
+    </Directory>
+    <Directory "D:/wamp64/www/yii2-timesCMS/backend/web">
+        RewriteEngine on
+        # if a directory or a file exists, use the request directly
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteCond %{REQUEST_FILENAME} !-d
+        # otherwise forward the request to index.php
+        RewriteRule . index.php
+
+        Require all granted
+    </Directory>
+    <Directory "D:/wamp64/www/yii2-timesCMS/storage/web">
+        RewriteEngine on
+        # if a directory or a file exists, use the request directly
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteCond %{REQUEST_FILENAME} !-d
+        # otherwise forward the request to index.php
+        RewriteRule . index.php
+
+        Require all granted
+    </Directory>
+    <FilesMatch \.(htaccess|htpasswd|svn|git)>
+        Require all denied
+    </FilesMatch>
+</VirtualHost>

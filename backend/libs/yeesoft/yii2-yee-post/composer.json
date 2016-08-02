@@ -1,0 +1,22 @@
+{
+  "name": "yeesoft/yii2-yee-post",
+  "description": "Post Module For Yee CMS",
+  "license": "Apache-2.0",
+  "authors": [
+    {
+      "name": "Taras Makitra",
+      "email": "makitrataras@gmail.com"
+    }
+  ],
+  "require": {
+    "yeesoft/yii2-yee-core": "dev-master",
+    "yeesoft/yii2-yee-media": "dev-master",
+    "paulzi/yii2-nested-intervals": "^1.0",
+    "nicolasbize/magicsuggest": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "yeesoft\\post\\": ""
+    }
+  }
+}

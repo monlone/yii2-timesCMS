@@ -1,0 +1,320 @@
+Yii 2 Starter Kit
+
+Packagist Packagist PayPal donate button Dependency Status Build Status
+
+This is Yii2 start application template.
+
+It was created and developing as a fast start for building an advanced sites based on Yii2.
+
+It covers typical use cases for a new project and will help you not to waste your time doing the same work in every project
+Before you start
+
+Please, consider helping project via contributions or donations.
+TABLE OF CONTENTS
+
+    Demo
+    Features
+    Installation
+        Manual installation
+        Docker installation
+        Vagrant installation
+    Application components
+    Console commands
+    Testing
+    FAQ
+    How to contribute?
+    Donations
+    Have any questions
+
+DEMO
+
+Demo is hosted by awesome Digital Ocean
+
+Frontend: http://yii2-starter-kit.terentev.net
+
+Backend: http://backend.yii2-starter-kit.terentev.net
+
+administrator role account
+
+Login: webmaster
+Password: webmaster
+
+manager role account
+
+Login: manager
+Password: manager
+
+user role account
+
+Login: user
+Password: user
+
+FEATURES
+
+    Beautiful and open source dashboard theme for backend AdminLTE 2
+    Translations: English, Spanish, Russian, Ukrainian, Chinese
+    Translations Editor
+    Language change action + behavior to choose locale based on browser preferred language
+    Sign in, Sign up, profile(avatar, locale, personal data), email activation etc
+    OAuth authorization
+    User management
+    RBAC with predefined guest, user, manager and administrator roles
+    RBAC migrations support
+    Content management components: articles, categories, static pages, editable menu, editable carousels, text blocks
+    Key-value storage component
+    Application settings form (based on KeyStorage component)
+    Ready-to-go RESTful API module
+    File storage component + file upload widget
+    On-demand thumbnail creation trntv/yii2-glide
+    Command Bus with queued and async tasks support trntv/yii2-command-bus
+    Useful behaviors (GlobalAccessBehavior, CacheInvalidateBehavior, MaintenanceBehavior)
+    Yii2 log web interface
+    Application timeline component
+    Cache web controller
+    Maintenance mode component (more)
+    System information web interface
+    dotenv support
+    ExtendedMessageController with ability to replace source code language and migrate messages between message sources
+    Aceeditor widget
+    Datetimepicker widget,
+    Imperavi Reactor Widget,
+    Elfinder Extension
+    Xhprof Debug panel
+    Extended IDE autocompletion
+    Nginx config example
+    Test-ready
+    Docker support and Vagrant support
+    Built-in mailcatcher
+    Assets compression and concatenation
+    Some useful shortcuts
+    many other features i'm lazy to write about :-)
+
+Application Components
+I18N
+
+If you want to store application messages in DB and to have ability to edit them from backend, run:
+
+php console/yii message/migrate @common/config/messages/php.php @common/config/messages/db.php
+
+it will copy all existing messages to database
+
+Then uncomment config for DbMessageSource in
+
+common/config/base.php
+
+KeyStorage
+
+Key storage is a key-value storage to store different information. Application settings for example. Values can be stored both via api or by backend CRUD component.
+
+Yii::$app->keyStorage->set('articles-per-page', 20);
+Yii::$app->keyStorage->get('articles-per-page'); // 20
+
+Maintenance mode
+
+Starter kit has built-in component to provide a maintenance functionality. All you have to do is to configure maintenance component in your config
+
+'bootstrap' => ['maintenance'],
+...
+'components' => [
+    ...
+    'maintenance' => [
+        'class' => 'common\components\maintenance\Maintenance',
+        'enabled' => Astronomy::isAFullMoonToday()
+    ]
+    ...
+]
+
+This component will catch all incoming requests, set proper response HTTP headers (503, "Retry After") and show a maintenance message. Additional configuration options can be found in a corresponding class.
+
+Starter kit configured to turn on maintenance mode if frontend.maintenance key in KeyStorage is set to true
+Command Bus
+
+    What is command bus?
+
+In Starter Kit Command Bus pattern is implemented with tactician package and it's yii2 connector - yii2-tactician
+
+Command are stored in common/commands/command directory, handlers in common/commands/handler
+
+To execute command run
+
+$sendEmailCommand = new SendEmailCommand(['to' => 'user@example.org', 'body' => 'Hello User!']);
+Yii::$app->commandBus->handle($sendEmailCommand);
+
+Timeline (Activity)
+
+$addToTimelineCommand = new AddToTimelineCommand([
+    'category' => 'user', 
+    'event' => 'signup', 
+    'data' => ['foo' => 'bar']
+]);
+Yii::$app->commandBus->handle($addToTimelineCommand);
+
+Behaviors
+CacheInvalidateBehavior
+
+ public function behaviors()
+ {
+     return [
+         [
+             'class' => `common\behaviors\CacheInvalidateBehavior`,
+             'tags' => [
+                  'awesomeTag',
+                   function($model){
+                       return "tag-{$model->id}"
+                  }
+              ],
+             'keys' => [
+                  'awesomeKey',
+                  function($model){
+                      return "key-{$model->id}"
+                  }
+              ]
+         ],
+     ];
+ }
+
+GlobalAccessBehavior
+
+Add in your application config:
+
+'as globalAccess'=>[
+        'class'=>'\common\behaviors\GlobalAccessBehavior',
+        'rules'=>[
+            [
+                'controllers'=>['sign-in'],
+                'allow' => true,
+                'roles' => ['?'],
+                'actions'=>['login']
+            ],
+            [
+                'controllers'=>['sign-in'],
+                'allow' => true,
+                'roles' => ['@'],
+                'actions'=>['logout']
+            ],
+            [
+                'controllers'=>['site'],
+                'allow' => true,
+                'roles' => ['?', '@'],
+                'actions'=>['error']
+            ],
+            [
+                'allow' => true,
+                'roles' => ['@']
+            ]
+        ]
+    ]
+
+It will allow access to you application only for authentificated users.
+Command Bus
+
+Read more about command bus on in official repository
+Widgets configurable from backend
+Carousel
+
+    Create carousel in backend
+    Use it:
+
+<?php echo DbCarousel::widget(['key' => 'key-from-backend']) ?>
+
+DbText
+
+    Create text block in backend
+    Use it:
+
+<?php echo DbText::widget(['key' => 'key-from-backend']) ?>
+
+DbMenu
+
+    Create text block in backend
+    Use it:
+
+<?php echo DbMenu::widget(['key' => 'key-from-backend']) ?>
+
+Widgets
+
+    WYSIWYG Redactor widget
+    DateTime picker
+    Ace Editor
+    File upload
+    ElFinder
+
+Grid
+EnumColumn
+
+ [
+      'class' => '\common\grid\EnumColumn',
+      'attribute' => 'status',
+      'enum' => User::getStatuses() // [0=>'Deleted', 1=>'Active']
+ ]
+
+API
+
+Starter Kit has fully configured and ready-to-go REST API module. You can access it on http://yii2-starter-kit.dev/api/v1 For some endpoints you should authenticate your requests with one of available methods - https://github.com/yiisoft/yii2/blob/master/docs/guide/rest-authentication.md#authentication
+MultiModel
+
+common\base\MultiModel - class for handling multiple models in one In controller:
+
+$model = new MultiModel([
+    'models' => [
+        'user' => $userModel,
+        'profile' => $userProfileModel
+    ]
+]);
+
+if ($model->load(Yii::$app->request->post()) && $model->save()) {
+    ...
+}
+
+In view:
+
+<?php echo $form->field($model->getModel('account'), 'username') ?>
+
+<?php echo $form->field($model->getModel('profile'), 'middlename')->textInput(['maxlength' => 255]) ?>    
+
+Other
+
+    common\behaviors\GlobalAccessBehavior - allows to set access rules for your application in application config
+
+    common\behaviors\LocaleBehavior - discover user locale from browser or account settings and set it
+
+    common\behaviors\LoginTimestampBehavior - logs user login time
+
+    common\validators\JsonValidator - validates a value to be a valid json
+
+    common\rbac\rule\OwnModelRule - simple rule for RBAC to check if the current user is model owner
+
+Yii::$app->user->can('editOwnModel', ['model' => $model]);
+
+    common\filters\OwnModelAccessFilter - action filter to check if user is allowed to manage this model
+
+public function behaviors()
+    {
+        return [
+            'modelAccess' => [
+                'class' => OwnModelAccessFilter::className(),
+                'only' => ['view', 'update', 'delete'],
+                'modelClass' => Article::className()
+            ],
+        ];
+    }
+
+How to contribute?
+
+You can contribute in any way you want. Any help appreciated, but most of all i need help with docs (^_^)
+Donations
+
+    Paypal
+    Bitcoin
+    WebMoney
+    Other way: eugene@terentev.net
+
+Have any questions?
+
+mail to eugene@terentev.net
+READ MORE
+
+https://github.com/yiisoft/yii2/blob/master/apps/advanced/README.md https://github.com/yiisoft/yii2/tree/master/docs
+NOTE
+
+This template was created mostly for developers NOT for end users. This is a point where you can begin your application, rather than creating it from scratch. Good luck!
