@@ -60,6 +60,8 @@ class StudyController extends Controller
         unset($property->title);
         echo isset($property->title);
         echo $property->getTitle();
+
+        return true;
     }
 
     //行为的使用
@@ -79,14 +81,14 @@ class StudyController extends Controller
     public function behaviors()
     {
         return [
-            'testBehavior' => [
-                            'class' => MyBehavior::className(),
-                            'user' => 'niubi',
-                        ],
-            // [
-            //     'class' => MyBehavior::className(),
-            //     'user' => 'niubi',
-            // ],
+            // 'testBehavior' => [
+            //                 'class' => MyBehavior::className(),
+            //                 'user' => 'niubi',
+            //             ],
+            [
+                'class' => MyBehavior::className(),
+                'user' => 'niubi',
+            ],
         ];
     }
 }
