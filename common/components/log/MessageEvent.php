@@ -11,3 +11,4 @@ class MessageEvent extends Event
 {  
     public $message;  
 }
+
